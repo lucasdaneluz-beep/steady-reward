@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { PageTitle, SectionLabel } from "@/components/app/AppShell";
 import { Button } from "@/components/ui/button";
@@ -213,7 +214,7 @@ function AccountPage() {
         onClick={continueWithGoogle}
         className="mt-5 w-full rounded-xl"
       >
-        <GoogleIcon />
+        {googleBusy ? <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" /> : <GoogleIcon />}
         {googleBusy ? "Connecting to Google…" : mode === "save" ? "Save with Google" : "Sign in with Google"}
       </Button>
       <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
