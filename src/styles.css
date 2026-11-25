@@ -124,6 +124,47 @@
   --sidebar-ring: oklch(0.76 0.15 70);
 }
 
+.dark {
+  --background: oklch(0.18 0.012 60);
+  --foreground: oklch(0.94 0.006 75);
+  --card: oklch(0.23 0.014 60);
+  --card-foreground: oklch(0.94 0.006 75);
+  --popover: oklch(0.23 0.014 60);
+  --popover-foreground: oklch(0.94 0.006 75);
+  --primary: oklch(0.88 0.006 75);
+  --primary-foreground: oklch(0.22 0.012 60);
+  --secondary: oklch(0.29 0.014 60);
+  --secondary-foreground: oklch(0.94 0.006 75);
+  --muted: oklch(0.27 0.012 60);
+  --muted-foreground: oklch(0.7 0.012 70);
+  --accent: oklch(0.3 0.035 75);
+  --accent-foreground: oklch(0.94 0.006 75);
+  --destructive: oklch(0.68 0.16 27);
+  --destructive-foreground: oklch(0.18 0.012 60);
+  --border: oklch(0.34 0.012 60);
+  --input: oklch(0.38 0.014 60);
+  --ring: oklch(0.78 0.13 70);
+  --amber: oklch(0.8 0.14 75);
+  --amber-soft: oklch(0.3 0.06 75);
+  --amber-ink: oklch(0.88 0.1 78);
+  --success: oklch(0.68 0.12 160);
+  --success-soft: oklch(0.28 0.045 160);
+  --success-ink: oklch(0.82 0.1 160);
+  --shadow-soft: 0 1px 2px oklch(0 0 0 / 20%), 0 8px 24px -12px oklch(0 0 0 / 40%);
+  --chart-1: oklch(0.8 0.14 75);
+  --chart-2: oklch(0.68 0.12 160);
+  --chart-3: oklch(0.7 0.012 70);
+  --chart-4: oklch(0.72 0.1 80);
+  --chart-5: oklch(0.76 0.09 160);
+  --sidebar: oklch(0.18 0.012 60);
+  --sidebar-foreground: oklch(0.94 0.006 75);
+  --sidebar-primary: oklch(0.88 0.006 75);
+  --sidebar-primary-foreground: oklch(0.22 0.012 60);
+  --sidebar-accent: oklch(0.29 0.014 60);
+  --sidebar-border: oklch(0.34 0.012 60);
+  --sidebar-ring: oklch(0.78 0.13 70);
+}
+
 @layer base {
   * {
     border-color: var(--color-border);
@@ -136,10 +177,31 @@
 }
 
 @layer base {
-  body { font-family: var(--font-sans); -webkit-tap-highlight-color: transparent; }
-  .tabular { font-variant-numeric: tabular-nums; }
+  body {
+    font-family: var(--font-sans);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
 }
 
-@keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.12); } 100% { transform: scale(1); } }
-@utility animate-pop { animation: pop 260ms ease-out; }
-@media (prefers-reduced-motion: reduce) { .animate-pop { animation: none; } }
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@utility animate-pop {
+  animation: pop 260ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-pop {
+    animation: none;
+  }
+}
