@@ -13,6 +13,23 @@ import { useSaveGoal } from "@/lib/data";
 import type { Goal } from "@/lib/progress";
 import { cn } from "@/lib/utils";
 
+type GoalSuggestion = { title: string; target: number; points: number };
+
+const suggestions: Record<"daily" | "weekly", GoalSuggestion[]> = {
+  daily: [
+    { title: "10-minute walk", target: 1, points: 10 },
+    { title: "Stretch for 5 minutes", target: 1, points: 10 },
+    { title: "Drink 6 glasses of water", target: 1, points: 10 },
+    { title: "Read for 10 minutes", target: 1, points: 10 },
+  ],
+  weekly: [
+    { title: "Strength training", target: 2, points: 10 },
+    { title: "Cardio", target: 3, points: 10 },
+    { title: "Mobility or yoga", target: 2, points: 10 },
+    { title: "Meal prep", target: 1, points: 10 },
+  ],
+};
+
 export function GoalDialog({
   open,
   onOpenChange,
@@ -57,6 +74,33 @@ export function GoalDialog({
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-4">
+          {!goal && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between gap-3">
+                <Label>Start with an example</Label>
+                <span className="text-xs text-muted-foreground">You can edit it below</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {suggestions[kind].map((suggestion) => (
+                  <button
+                    key={suggestion.title}
+                    type="button"
+                    onClick={() => {
+                      setTitle(suggestion.title);
+                      setTarget(suggestion.target);
+                      setPoints(suggestion.points);
+                    }}
+                    className={cn(
+                      "min-h-11 rounded-xl border bg-card px-3 py-2 text-left text-sm font-medium transition-colors hover:bg-muted",
+                      title === suggestion.title && "border-foreground/40 bg-muted",
+                    )}
+                  >
+                    {suggestion.title}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="space-y-1.5">
             <Label htmlFor="g-title">Name</Label>
             <Input
