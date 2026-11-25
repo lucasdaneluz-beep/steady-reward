@@ -18,11 +18,31 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     (async () => {
       setError(null);
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        if (!cancelled) { setUser(data.session.user); setReady(true); }
-        return;
+      const { data, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) {
+        await supabase.auth.signOut({ scope: "local" });
       }
+
+      if (data.session && !sessionError) {
+        const { data: current, error: userError } = await supabase.auth.getUser();
+        const errorText = userError?.message.toLowerCase() ?? "";
+        const staleUser = errorText.includes("sub claim")
+          || errorText.includes("user does not exist")
+          || errorText.includes("user_not_found");
+
+        if (!userError && current.user) {
+          if (!cancelled) { setUser(current.user); setReady(true); }
+          return;
+        }
+
+        if (!staleUser) {
+          if (!cancelled) setError(userError?.message ?? "Unable to validate your session.");
+          return;
+        }
+
+        await supabase.auth.signOut({ scope: "local" });
+      }
+
       const { data: anon, error: err } = await supabase.auth.signInAnonymously();
       if (cancelled) return;
       if (err) { setError(err.message); return; }
