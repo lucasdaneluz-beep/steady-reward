@@ -8,7 +8,8 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { ArrowRight, Gift, ListChecks, Sparkle } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -153,13 +154,15 @@ function RootComponent() {
 
 function Gate() {
   const { ready, error, retry } = useSession();
+  const [showIntro, setShowIntro] = useState(false);
+  useEffect(() => {
+    setShowIntro(window.localStorage.getItem("steady-intro-seen") !== "1");
+  }, []);
   if (error)
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center gap-3 px-6 text-center">
         <p className="font-display text-3xl">Couldn't start your session</p>
-        <p className="max-w-xs text-sm text-muted-foreground">
-          {error}
-        </p>
+        <p className="max-w-xs text-sm text-muted-foreground">{error}</p>
         <Button onClick={retry} className="rounded-xl">
           Try again
         </Button>
@@ -171,9 +174,114 @@ function Gate() {
         <p className="font-display text-3xl text-muted-foreground animate-pulse">Steady</p>
       </div>
     );
+  if (showIntro)
+    return (
+      <Intro
+        onContinue={() => {
+          window.localStorage.setItem("steady-intro-seen", "1");
+          setShowIntro(false);
+        }}
+      />
+    );
   return (
     <AppShell>
       <Outlet />
     </AppShell>
+  );
+}
+
+function Intro({ onContinue }: { onContinue: () => void }) {
+  return (
+    <main className="min-h-dvh bg-background px-5 py-6 sm:py-10">
+      <div className="mx-auto flex min-h-[calc(100dvh-3rem)] max-w-xl flex-col justify-between sm:min-h-0">
+        <header className="flex items-center justify-between">
+          <span className="font-display text-2xl leading-none tracking-tight">Steady</span>
+          <span className="rounded-full border border-amber/30 bg-amber-soft px-3 py-1 text-xs font-semibold text-amber-ink">
+            Small steps, kept
+          </span>
+        </header>
+
+        <section className="py-10 sm:py-16">
+          <p className="mb-4 text-sm font-semibold uppercase tracking-[0.14em] text-success-ink">
+            Your progress, made visible
+          </p>
+          <h1 className="max-w-md font-display text-5xl leading-[0.98] tracking-tight sm:text-6xl">
+            Do what matters. Earn what you want.
+          </h1>
+          <p className="mt-5 max-w-md text-base leading-7 text-muted-foreground">
+            Check off habits and weekly goals to earn points. Then spend those points on rewards you
+            choose for yourself.
+          </p>
+
+          <div className="mt-8 grid gap-3 sm:grid-cols-3">
+            <IntroStep
+              icon={<ListChecks className="size-5" />}
+              number="01"
+              title="Check in"
+              body="Log a habit or session."
+            />
+            <IntroStep
+              icon={<Sparkle className="size-5" />}
+              number="02"
+              title="Earn points"
+              body="Build momentum, one check-in at a time."
+            />
+            <IntroStep
+              icon={<Gift className="size-5" />}
+              number="03"
+              title="Redeem"
+              body="Trade points for something good."
+            />
+          </div>
+
+          <div className="mt-8 rounded-2xl border border-amber/30 bg-amber-soft/55 px-4 py-3.5 text-sm text-amber-ink">
+            <span className="font-semibold">Start with a reward in mind.</span> A reward makes the
+            points feel worth earning.
+          </div>
+        </section>
+
+        <section className="space-y-3 sm:max-w-sm">
+          <Button onClick={onContinue} className="h-12 w-full rounded-xl text-base">
+            Try it without an account <ArrowRight className="ml-1 size-4" />
+          </Button>
+          <Link
+            to="/account"
+            onClick={onContinue}
+            className="flex min-h-11 items-center justify-center rounded-xl border border-border bg-card px-4 text-sm font-semibold transition-colors hover:bg-muted"
+          >
+            Create an account to save your progress
+          </Link>
+          <p className="text-center text-xs leading-5 text-muted-foreground">
+            No sign-up needed to begin. Guest progress stays on this device until you choose to save
+            it.
+          </p>
+        </section>
+      </div>
+    </main>
+  );
+}
+
+function IntroStep({
+  icon,
+  number,
+  title,
+  body,
+}: {
+  icon: ReactNode;
+  number: string;
+  title: string;
+  body: string;
+}) {
+  return (
+    <div className="rounded-2xl border bg-card px-4 py-4 shadow-soft">
+      <div className="flex items-center justify-between text-muted-foreground">
+        <span className="grid size-9 place-items-center rounded-xl bg-success-soft text-success-ink">
+          {icon}
+        </span>
+        <span className="text-[11px] font-semibold tracking-[0.14em]">{number}</span>
+      </div>
+      <p className="mt-4 font-semibold">{title}</p>
+      <p className="mt-1 text-sm leading-5 text-muted-foreground">{body}</p>
+    </div>
   );
 }
