@@ -185,12 +185,14 @@ export type GoalInput = { title: string; kind: "daily" | "weekly"; target: numbe
 
 export function useSaveGoal() {
   const inv = useInvalidate();
+  const { user } = useSession();
   return useMutation({
     mutationFn: async ({ id, ...v }: GoalInput & { id?: string | undefined }) => {
+      if (!user) throw new Error("Your session is still starting. Please try again.");
       const payload = { ...v, target: v.kind === "daily" ? 1 : v.target };
       const { error } = id
         ? await supabase.from("goals").update(payload).eq("id", id)
-        : await supabase.from("goals").insert(payload);
+        : await supabase.from("goals").insert({ ...payload, user_id: user.id });
       if (error) throw error;
     },
     onError: fail,
