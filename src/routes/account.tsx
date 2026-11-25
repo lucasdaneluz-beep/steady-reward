@@ -105,9 +105,12 @@ function AccountPage() {
     setGoogleBusy(true);
     try {
       const redirectTo = `${window.location.origin}/account`;
-      const result = guest
+      const result = guest && mode === "save"
         ? await supabase.auth.linkIdentity({ provider: "google", options: { redirectTo } })
-        : await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo } });
+        : await supabase.auth.signInWithOAuth({
+            provider: "google",
+            options: { redirectTo, skipBrowserRedirect: true },
+          });
 
       if (result.error) {
         const message = result.error.message.toLowerCase().includes("manual linking")
