@@ -1,9 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { HelpCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { PageTitle, SectionLabel } from "@/components/app/AppShell";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
@@ -105,12 +115,13 @@ function AccountPage() {
     setGoogleBusy(true);
     try {
       const redirectTo = `${window.location.origin}/account`;
-      const result = guest && mode === "save"
-        ? await supabase.auth.linkIdentity({ provider: "google", options: { redirectTo } })
-        : await supabase.auth.signInWithOAuth({
-            provider: "google",
-            options: { redirectTo, skipBrowserRedirect: true },
-          });
+      const result =
+        guest && mode === "save"
+          ? await supabase.auth.linkIdentity({ provider: "google", options: { redirectTo } })
+          : await supabase.auth.signInWithOAuth({
+              provider: "google",
+              options: { redirectTo, skipBrowserRedirect: true },
+            });
 
       if (result.error) {
         const message = result.error.message.toLowerCase().includes("manual linking")
@@ -123,7 +134,9 @@ function AccountPage() {
       if (result.data?.url) {
         window.location.assign(result.data.url);
       } else {
-        toast.error("Google sign-in could not start. Check that the Google provider is enabled in Supabase.");
+        toast.error(
+          "Google sign-in could not start. Check that the Google provider is enabled in Supabase.",
+        );
       }
     } catch (error) {
       console.error("Google sign-in failed", error);
@@ -180,6 +193,7 @@ function AccountPage() {
         >
           Sign out
         </Button>
+        <HowSteadyWorks />
       </>
     );
 
@@ -217,8 +231,16 @@ function AccountPage() {
         onClick={continueWithGoogle}
         className="mt-5 w-full rounded-xl"
       >
-        {googleBusy ? <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" /> : <GoogleIcon />}
-        {googleBusy ? "Connecting to Google…" : mode === "save" ? "Save with Google" : "Sign in with Google"}
+        {googleBusy ? (
+          <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
+        ) : (
+          <GoogleIcon />
+        )}
+        {googleBusy
+          ? "Connecting to Google…"
+          : mode === "save"
+            ? "Save with Google"
+            : "Sign in with Google"}
       </Button>
       <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
         <span className="h-px flex-1 bg-border" />
@@ -282,6 +304,58 @@ function AccountPage() {
         Guest progress lives in this browser. Clearing it, or switching devices, would start you
         fresh.
       </p>
+      <HowSteadyWorks />
     </>
+  );
+}
+
+function HowSteadyWorks() {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="ghost" className="mt-5 w-full rounded-xl text-muted-foreground">
+          <HelpCircle aria-hidden="true" className="size-4" />
+          How Steady works
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-md rounded-2xl p-5 sm:p-6">
+        <DialogHeader>
+          <DialogTitle className="font-display text-3xl font-normal">How Steady works</DialogTitle>
+          <DialogDescription>
+            Turn small actions into progress—and progress into rewards.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3">
+          <HelpItem title="Check in">
+            Complete a daily habit or log a session toward a weekly goal.
+          </HelpItem>
+          <HelpItem title="Earn points">
+            Each check-in earns the points assigned to that goal.
+          </HelpItem>
+          <HelpItem title="Redeem rewards">
+            Choose something you look forward to, set its point cost, and redeem it when you have
+            enough points.
+          </HelpItem>
+        </div>
+        <div className="rounded-xl border border-amber/30 bg-amber-soft/55 px-3.5 py-3 text-sm leading-5 text-amber-ink">
+          You can use Steady without an account. Your progress stays on this device. Create an
+          account to keep it if you switch devices or clear your browser.
+        </div>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button className="w-full rounded-xl">Got it</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function HelpItem({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-xl bg-muted/60 px-3.5 py-3">
+      <p className="text-sm font-semibold">{title}</p>
+      <p className="mt-0.5 text-sm leading-5 text-muted-foreground">{children}</p>
+    </div>
   );
 }
