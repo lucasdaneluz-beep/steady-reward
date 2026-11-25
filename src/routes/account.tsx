@@ -32,6 +32,29 @@ export const Route = createFileRoute("/account")({
   component: AccountPage,
 });
 
+function GoogleIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 shrink-0">
+      <path
+        fill="#4285F4"
+        d="M21.35 12.23c0-.72-.06-1.42-.18-2.09H12v3.95h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.7 2.91-4.2 2.91-7.25Z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 21.5c2.63 0 4.84-.87 6.45-2.37l-3.14-2.45c-.87.58-1.98.92-3.31.92-2.54 0-4.7-1.72-5.47-4.03H3.29v2.53A9.74 9.74 0 0 0 12 21.5Z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M6.53 13.57a5.85 5.85 0 0 1 0-3.14V7.9H3.29a9.5 9.5 0 0 0 0 8.2l3.24-2.53Z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 6.4c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.84 3.47 14.63 2.5 12 2.5a9.74 9.74 0 0 0-8.71 5.4l3.24 2.53C7.3 8.12 9.46 6.4 12 6.4Z"
+      />
+    </svg>
+  );
+}
+
 function AccountPage() {
   const { user } = useSession();
   const guest = !!user?.is_anonymous;
@@ -85,7 +108,10 @@ function AccountPage() {
       : await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo } });
     setGoogleBusy(false);
     if (result.error) {
-      toast.error(result.error.message);
+      const message = result.error.message.toLowerCase().includes("manual linking")
+        ? "Enable Manual Linking in Supabase Auth settings to save guest progress with Google."
+        : result.error.message;
+      toast.error(message);
     }
   };
 
@@ -173,6 +199,7 @@ function AccountPage() {
         onClick={continueWithGoogle}
         className="mt-5 w-full rounded-xl"
       >
+        <GoogleIcon />
         {googleBusy ? "Connecting to Google…" : mode === "save" ? "Save with Google" : "Sign in with Google"}
       </Button>
       <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
