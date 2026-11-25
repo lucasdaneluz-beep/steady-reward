@@ -12,6 +12,10 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { Toaster } from "@/components/ui/sonner";
+import { SessionProvider, useSession } from "@/lib/session";
+import { AppShell } from "@/components/app/AppShell";
+import { Button } from "@/components/ui/button";
 
 function NotFoundComponent() {
   return (
@@ -81,14 +85,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Steady — Habits, goals & rewards" },
+      { name: "description", content: "Track daily habits and weekly goals, earn points, and redeem rewards you set for yourself." },
+      { property: "og:title", content: "Steady — Habits, goals & rewards" },
+      { property: "og:description", content: "Track daily habits and weekly goals, earn points, and redeem rewards you set for yourself." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {
@@ -96,6 +98,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif&display=swap" },
     ],
   }),
   shellComponent: RootShell,
@@ -124,7 +129,33 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <SessionProvider>
+        <Gate />
+      </SessionProvider>
+      <Toaster position="top-center" />
     </QueryClientProvider>
+  );
+}
+
+function Gate() {
+  const { ready, error, retry } = useSession();
+  if (error)
+    return (
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-3 px-6 text-center">
+        <p className="font-display text-3xl">Couldn't start your session</p>
+        <p className="max-w-xs text-sm text-muted-foreground">Check your connection and try again.</p>
+        <Button onClick={retry} className="rounded-xl">Try again</Button>
+      </div>
+    );
+  if (!ready)
+    return (
+      <div className="flex min-h-dvh items-center justify-center">
+        <p className="font-display text-3xl text-muted-foreground animate-pulse">Steady</p>
+      </div>
+    );
+  return (
+    <AppShell>
+      <Outlet />
+    </AppShell>
   );
 }

@@ -28,3 +28,9 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+- Points balance is only ever the sum of `point_transactions`; that table is append-only (trigger-enforced) and written solely by the `check_in`, `undo_check_in` and `redeem_reward` database functions — why: balances can never drift from history.
+- Undoing a check-in marks the completion `undone_at` and appends a reversal; goals/rewards are archived, never deleted — why: the ledger keeps valid references.
+- Every visitor gets an anonymous session on first load (`src/lib/session.tsx`); new users are seeded with default goals/rewards by a trigger on auth.users — why: instant guest use, linkable later via email/password.
+- Rules live in `src/lib/progress.ts` / `dates.ts` / `streak.ts` with tests in `src/lib/progress.test.ts`; weeks start Monday on both client and database.
