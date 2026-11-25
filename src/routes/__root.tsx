@@ -158,7 +158,7 @@ function Gate() {
       <div className="flex min-h-dvh flex-col items-center justify-center gap-3 px-6 text-center">
         <p className="font-display text-3xl">Couldn't start your session</p>
         <p className="max-w-xs text-sm text-muted-foreground">
-          Check your connection and try again.
+          {error}
         </p>
         <Button onClick={retry} className="rounded-xl">
           Try again
