@@ -71,16 +71,7 @@ function GoalsPage() {
 
   return (
     <>
-      <PageTitle
-        title="Goals"
-        sub="What you're building, day by day."
-        action={
-          <Button onClick={openNew} size="sm" className="rounded-xl">
-            <Plus className="size-4" />
-            New
-          </Button>
-        }
-      />
+      <PageTitle title="Goals" sub="What you're building, day by day." />
       {isLoading ? (
         <ListSkeleton />
       ) : !goals.length ? (
@@ -88,9 +79,16 @@ function GoalsPage() {
           title="No goals yet"
           body="Start with one small daily habit. You can add weekly targets too."
           action={
-            <Button onClick={openNew} className="rounded-xl">
-              Add your first goal
-            </Button>
+            <div className="flex flex-wrap justify-center gap-2">
+              <Button onClick={() => openNew("daily")} className="rounded-xl">
+                <Plus className="size-4" />
+                Add habit
+              </Button>
+              <Button onClick={() => openNew("weekly")} className="rounded-xl">
+                <Plus className="size-4" />
+                Add target
+              </Button>
+            </div>
           }
         />
       ) : (
@@ -101,7 +99,6 @@ function GoalsPage() {
                 <SectionLabel
                   right={
                     <Button
-                      variant="ghost"
                       size="sm"
                       className="h-7 rounded-lg px-2 text-xs"
                       onClick={() => openNew(grp.kind)}
