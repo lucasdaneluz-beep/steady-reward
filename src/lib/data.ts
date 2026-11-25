@@ -185,13 +185,14 @@ export type GoalInput = { title: string; kind: "daily" | "weekly"; target: numbe
 
 export function useSaveGoal() {
   const inv = useInvalidate();
-  const { user } = useSession();
   return useMutation({
     mutationFn: async ({ id, ...v }: GoalInput & { id?: string | undefined }) => {
-      if (!user) throw new Error("Your session is still starting. Please try again.");
+      const { data: current } = await supabase.auth.getUser();
+      const user = current.user;
+      if (!user) throw new Error("Your session has expired. Please sign in again.");
       const payload = { ...v, target: v.kind === "daily" ? 1 : v.target };
       const { error } = id
-        ? await supabase.from("goals").update(payload).eq("id", id)
+        ? await supabase.from("goals").update(payload).eq("id", id).eq("user_id", user.id)
         : await supabase.from("goals").insert({ ...payload, user_id: user.id });
       if (error) throw error;
     },
@@ -210,7 +211,14 @@ export function useUpdateGoal() {
       id: string;
       patch: Partial<Pick<Goal, "paused" | "archived">>;
     }) => {
-      const { error } = await supabase.from("goals").update(patch).eq("id", id);
+      const { data: current } = await supabase.auth.getUser();
+      const user = current.user;
+      if (!user) throw new Error("Your session has expired. Please sign in again.");
+      const { error } = await supabase
+        .from("goals")
+        .update(patch)
+        .eq("id", id)
+        .eq("user_id", user.id);
       if (error) throw error;
     },
     onError: fail,
