@@ -102,16 +102,30 @@ function AccountPage() {
 
   const continueWithGoogle = async () => {
     setGoogleBusy(true);
-    const redirectTo = `${window.location.origin}/account`;
-    const result = guest
-      ? await supabase.auth.linkIdentity({ provider: "google", options: { redirectTo } })
-      : await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo } });
-    setGoogleBusy(false);
-    if (result.error) {
-      const message = result.error.message.toLowerCase().includes("manual linking")
-        ? "Enable Manual Linking in Supabase Auth settings to save guest progress with Google."
-        : result.error.message;
-      toast.error(message);
+    try {
+      const redirectTo = `${window.location.origin}/account`;
+      const result = guest
+        ? await supabase.auth.linkIdentity({ provider: "google", options: { redirectTo } })
+        : await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo } });
+
+      if (result.error) {
+        const message = result.error.message.toLowerCase().includes("manual linking")
+          ? "Enable Manual Linking in Supabase Auth settings to save guest progress with Google."
+          : result.error.message;
+        toast.error(message);
+        return;
+      }
+
+      if (result.data?.url) {
+        window.location.assign(result.data.url);
+      } else {
+        toast.error("Google sign-in could not start. Check that the Google provider is enabled in Supabase.");
+      }
+    } catch (error) {
+      console.error("Google sign-in failed", error);
+      toast.error(error instanceof Error ? error.message : "Google sign-in could not start.");
+    } finally {
+      setGoogleBusy(false);
     }
   };
 
