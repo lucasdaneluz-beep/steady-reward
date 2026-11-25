@@ -39,6 +39,7 @@ function AccountPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [googleBusy, setGoogleBusy] = useState(false);
   const [passkeyBusy, setPasskeyBusy] = useState(false);
   const [sent, setSent] = useState(false);
   const canUsePasskeys = passkeysEnabled && passkeysSupported();
@@ -73,6 +74,18 @@ function AccountPage() {
         return;
       }
       toast.success("Signed in");
+    }
+  };
+
+  const continueWithGoogle = async () => {
+    setGoogleBusy(true);
+    const redirectTo = `${window.location.origin}/account`;
+    const result = guest
+      ? await supabase.auth.linkIdentity({ provider: "google", options: { redirectTo } })
+      : await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo } });
+    setGoogleBusy(false);
+    if (result.error) {
+      toast.error(result.error.message);
     }
   };
 
@@ -152,6 +165,20 @@ function AccountPage() {
         >
           I have an account
         </button>
+      </div>
+      <Button
+        type="button"
+        variant="outline"
+        disabled={googleBusy || busy}
+        onClick={continueWithGoogle}
+        className="mt-5 w-full rounded-xl"
+      >
+        {googleBusy ? "Connecting to Google…" : mode === "save" ? "Save with Google" : "Sign in with Google"}
+      </Button>
+      <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
+        <span className="h-px flex-1 bg-border" />
+        <span>or use email</span>
+        <span className="h-px flex-1 bg-border" />
       </div>
       {sent ? (
         <div className="mt-5 rounded-2xl border border-success/25 bg-success-soft/60 px-4 py-4 text-sm">
