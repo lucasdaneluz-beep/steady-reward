@@ -14,6 +14,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { SessionProvider, useSession } from "@/lib/session";
+import { SyncProvider } from "@/lib/sync";
 import { AppShell } from "@/components/app/AppShell";
 import { Button } from "@/components/ui/button";
 
@@ -86,9 +87,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Steady — Habits, goals & rewards" },
-      { name: "description", content: "Track daily habits and weekly goals, earn points, and redeem rewards you set for yourself." },
+      {
+        name: "description",
+        content:
+          "Track daily habits and weekly goals, earn points, and redeem rewards you set for yourself.",
+      },
       { property: "og:title", content: "Steady — Habits, goals & rewards" },
-      { property: "og:description", content: "Track daily habits and weekly goals, earn points, and redeem rewards you set for yourself." },
+      {
+        property: "og:description",
+        content:
+          "Track daily habits and weekly goals, earn points, and redeem rewards you set for yourself.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -100,7 +109,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif&display=swap",
+      },
     ],
   }),
   shellComponent: RootShell,
@@ -130,7 +142,9 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <SessionProvider>
-        <Gate />
+        <SyncProvider>
+          <Gate />
+        </SyncProvider>
       </SessionProvider>
       <Toaster position="top-center" />
     </QueryClientProvider>
@@ -143,8 +157,12 @@ function Gate() {
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center gap-3 px-6 text-center">
         <p className="font-display text-3xl">Couldn't start your session</p>
-        <p className="max-w-xs text-sm text-muted-foreground">Check your connection and try again.</p>
-        <Button onClick={retry} className="rounded-xl">Try again</Button>
+        <p className="max-w-xs text-sm text-muted-foreground">
+          Check your connection and try again.
+        </p>
+        <Button onClick={retry} className="rounded-xl">
+          Try again
+        </Button>
       </div>
     );
   if (!ready)
